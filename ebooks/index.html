@@ -9,15 +9,42 @@
 <body>
   <div id="nav-mount"></div>
   
-<div class="container">
-  <div class="section">
-    <h2>Ebooks (PDF)</h2>
-    <p class="subtitle">Add PDFs to <code>/ebooks</code> and list them in <code>/data/ebooks.json</code>.</p>
-    <div class="grid" id="ebooks-grid"></div>
+  <div class="container">
+    <div class="section">
+      <h2>Ebooks (PDF)</h2>
+      <p class="subtitle">Add PDFs to <code>/ebooks</code> and list them in <code>/data/ebooks.json</code>.</p>
+      <div class="grid" id="ebooks-grid"></div>
+    </div>
   </div>
-</div>
 
   <div id="footer-mount"></div>
+
   <script src="/assets/js/main.js"></script>
+  <script>
+    // Always fetch from root so it works on any page
+    fetch('/data/ebooks.json')
+      .then(response => {
+        if (!response.ok) throw new Error("Failed to load ebooks.json");
+        return response.json();
+      })
+      .then(data => {
+        const grid = document.getElementById('ebooks-grid');
+        data.forEach(book => {
+          const card = document.createElement('div');
+          card.className = 'card';
+          card.innerHTML = `
+            <h3>${book.title}</h3>
+            <p>${book.desc}</p>
+            <a href="${book.href}" target="_blank">Download</a>
+          `;
+          grid.appendChild(card);
+        });
+      })
+      .catch(err => {
+        document.getElementById('ebooks-grid').innerHTML =
+          `<div class="error">Could not load /data/ebooks.json</div>`;
+        console.error(err);
+      });
+  </script>
 </body>
 </html>
