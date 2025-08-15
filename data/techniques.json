@@ -1,0 +1,15 @@
+[
+  {
+    "title": "Reflected XSS quick test",
+    "desc": "Fast payload for input reflection testing.",
+    "code": "<script>alert('XSS')</script>"
+  },
+  {
+    "title": "CSRF basics",
+    "desc": "Check for missing CSRF tokens on state-changing POST endpoints."
+  },
+  {
+    "title": "Session hardening",
+    "desc": "HttpOnly, Secure, SameSite, short TTL."
+  }
+]

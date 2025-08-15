@@ -1,0 +1,54 @@
+<!DOCTYPE html><html lang="en"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Ebooks - CipherBikram</title>
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#a35cff">
+<style>body{background:#0a0b10;color:#e9e9ee}.container{max-width:1200px;margin:0 auto;padding:24px 18px}.hidden{display:none}</style>
+<script src="assets/js/basepath.js"></script>
+<link id="theme-css" rel="stylesheet" href="">
+<script>document.addEventListener('DOMContentLoaded', function(){ document.getElementById('theme-css').href = $u('assets/css/style.css'); });</script>
+</head><body>
+<div id="nav-mount"></div>
+
+<div class="container section">
+  <h2>Ebooks (PDF)</h2>
+  <div class="searchbar"><input id="q" placeholder="Search ebooks..." /><button id="go">Search</button></div>
+  <div class="grid" id="ebooks-grid"></div>
+</div>
+<script type="module">
+import { safeJSON, openPreview } from '../assets/js/main.js';
+const grid = document.getElementById('ebooks-grid');
+let DATA=[];
+function render(list){
+  grid.innerHTML='';
+  if(!list.length){ grid.innerHTML='<div class="notice">No ebooks yet. Upload to /ebooks and push.</div>'; return; }
+  list.forEach(item=>{
+    const c=document.createElement('div'); c.className='card reveal';
+    const thumb=item.thumb && item.thumb.trim()? item.thumb : 'assets/img/pdf-placeholder.jpg';
+    c.innerHTML=`
+      <div class="thumb-wrap"><img class="thumb-img" src="${$u(thumb)}" alt="${item.title}" loading="lazy"></div>
+      <div class="title">${item.title}</div>
+      <div class="desc">${item.desc||''}</div>
+      <div class="tag">${item.size||''} ${item.date? ' | '+item.date:''}</div>
+      <div style="margin-top:8px">
+        <a class="btn btn-primary" href="${$u(item.href)}" target="_blank" rel="noopener">View</a>
+        <button class="btn" data-href="${item.href}">Preview</button>
+      </div>`;
+    c.querySelector('button.btn').addEventListener('click', (e)=> openPreview(e.target.dataset.href));
+    grid.appendChild(c);
+  });
+}
+(async function(){ DATA = await safeJSON('ebooks_list.json'); render(DATA); })();
+function search(){
+  const q=(document.getElementById('q').value||'').toLowerCase().trim();
+  if(!q) return render(DATA);
+  const out = DATA.filter(i=> (i.title+' '+(i.desc||'')).toLowerCase().includes(q));
+  render(out);
+}
+document.getElementById('go').addEventListener('click', search);
+document.getElementById('q').addEventListener('keydown', e=>{ if(e.key==='Enter') search(); });
+</script>
+
+<div id="footer-mount"></div>
+<script type="module" src="assets/js/main.js"></script>
+</body></html>
