@@ -1,0 +1,22 @@
+{
+  "100-free-security-tools.pdf": {
+    "title": "100 Free Security Tools",
+    "category": "Tools & Suites",
+    "tags": [
+      "DFIR",
+      "Pentest",
+      "Scanner"
+    ],
+    "desc": "A curated index of free security tools used by red/blue teams."
+  },
+  "Advanced-Bash-Shell-Scripting-Gude.pdf": {
+    "title": "Advanced Bash Shell Scripting Guide",
+    "category": "Scripting & Automation",
+    "tags": [
+      "Bash",
+      "Linux",
+      "Automation"
+    ],
+    "desc": "Deep-dive into bash scripting patterns, tips and real-world recipes."
+  }
+}

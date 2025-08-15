@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Hacker Gallery - CipherBikram</title>
+  <link rel="stylesheet" href="assets/css/style.css">
+  <link rel="manifest" href="/manifest.json">
+  <meta name="theme-color" content="#bb00ff">
+</head>
+<body>
+  <div id="nav-mount"></div>
+  
+<div class="container">
+  <div class="section">
+    <h2>Hacker Gallery</h2>
+    <div id="gallery-grid"></div>
+  </div>
+</div>
+
+  <div id="footer-mount"></div>
+  <script src="assets/js/main.js"></script>
+
+<script>
+if('serviceWorker' in navigator){
+  navigator.serviceWorker.register('/service-worker.js').catch(()=>console.log('SW register failed'));
+}
+</script>
+</body>
+
+</html>

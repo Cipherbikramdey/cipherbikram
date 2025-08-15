@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Home - CipherBikram</title>
+  <link rel="stylesheet" href="assets/css/style.css">
+  <link rel="manifest" href="/manifest.json">
+  <meta name="theme-color" content="#bb00ff">
+</head>
+<body>
+  <div id="nav-mount"></div>
+  
+<section class="hero">
+  <canvas id="matrixCanvas"></canvas>
+  <div class="hero-inner">
+    <div>
+      <h1>CipherBikram — Advanced Hacking Resources</h1>
+      <p class="subtitle">Purple neon, terminal vibes. Ebooks, techniques, tools, a hacker gallery, and blogs — all in one place.</p>
+      <div class="searchbar">
+        <input type="text" placeholder="Search ebooks, techniques, blogs..." aria-label="Search">
+        <button class="btn btn-primary">Search</button>
+      </div>
+    </div>
+    <div class="terminal">
+      <pre>$ Welcome to CipherBikram
+$ Your gateway to hacking resources...
+$ Type. Learn. Hack (ethically).</pre>
+    </div>
+  </div>
+</section>
+<div class="container">
+  <div class="section">
+    <h2>Featured Resources</h2>
+    <div class="grid" id="ebooks-grid"></div>
+  </div>
+</div>
+
+  <div id="footer-mount"></div>
+  <script src="assets/js/main.js"></script>
+
+<script>
+(function(){
+  const canvas = document.getElementById('matrixCanvas');
+  if(!canvas) return;
+  const ctx = canvas.getContext('2d');
+  function resize(){ canvas.width = window.innerWidth; canvas.height = document.querySelector('.hero').offsetHeight; }
+  resize(); window.addEventListener('resize', resize);
+  const letters = '01ABCDEFGHIJKLMNOPQRSTUVWXYZ#$%@'.split('');
+  const fontSize = 14;
+  let columns = Math.floor(canvas.width / fontSize);
+  let drops = Array(columns).fill(1);
+  function draw(){
+    ctx.fillStyle = 'rgba(10,10,10,0.08)';
+    ctx.fillRect(0,0,canvas.width,canvas.height);
+    ctx.fillStyle = '#bb00ff';
+    ctx.font = fontSize + 'px monospace';
+    for(let i=0;i<drops.length;i++){
+      const text = letters[Math.floor(Math.random()*letters.length)];
+      ctx.fillText(text, i*fontSize, drops[i]*fontSize);
+      if(drops[i]*fontSize > canvas.height && Math.random() > 0.95){ drops[i]=0; }
+      drops[i]++;
+    }
+    requestAnimationFrame(draw);
+  }
+  draw();
+})();
+</script>
+
+
+<script>
+if('serviceWorker' in navigator){
+  navigator.serviceWorker.register('/service-worker.js').catch(()=>console.log('SW register failed'));
+}
+</script>
+</body>
+
+</html>

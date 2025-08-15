@@ -1,0 +1,20 @@
+{
+  "name": "CipherBikram",
+  "short_name": "CipherBikram",
+  "start_url": "/index.html",
+  "display": "standalone",
+  "background_color": "#0a0a0a",
+  "theme_color": "#bb00ff",
+  "icons": [
+    {
+      "src": "/images/hacker1.jpg",
+      "sizes": "192x192",
+      "type": "image/jpeg"
+    },
+    {
+      "src": "/images/hacker2.jpg",
+      "sizes": "512x512",
+      "type": "image/jpeg"
+    }
+  ]
+}

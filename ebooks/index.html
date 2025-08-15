@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Ebooks - CipherBikram</title>
+<link rel="stylesheet" href="../assets/css/style.css">
+  <link rel="manifest" href="/manifest.json">
+  <meta name="theme-color" content="#bb00ff">
+</head>
+<body>
+<div id="nav-mount"></div>
+<div class="container">
+  <div class="section">
+    <h2>Ebooks (PDF)</h2>
+    <p class="subtitle">Auto-generated from /ebooks. Add optional metadata in <code>/data/ebooks_meta.json</code> for tags & descriptions.</p>
+    <div style="display:flex; gap:10px; flex-wrap:wrap; margin:10px 0;">
+      <input type="text" id="searchBox" placeholder="Search ebooks..." style="padding:8px; flex:1; min-width:180px;">
+      <select id="categoryFilter" style="padding:8px; min-width:160px;">
+        <option value="">All Categories</option>
+      </select>
+      <select id="sortSelect" style="padding:8px; min-width:160px;">
+        <option value="title-asc">Title A→Z</option>
+        <option value="title-desc">Title Z→A</option>
+        <option value="date-desc">Newest</option>
+        <option value="date-asc">Oldest</option>
+        <option value="size-desc">Largest</option>
+        <option value="size-asc">Smallest</option>
+      </select>
+    </div>
+    <div class="grid" id="ebooks-grid"></div>
+  </div>
+</div>
+<div id="footer-mount"></div>
+
+<!-- Lightbox Modal -->
+<div id="pdfModal" class="modal">
+  <div class="box">
+    <header>
+      <div id="pdfTitle">Preview</div>
+      <button id="pdfClose" class="btn">Close</button>
+    </header>
+    <div class="content">
+      <iframe id="pdfFrame" src=""></iframe>
+    </div>
+  </div>
+</div>
+
+<script src="../assets/js/main.js"></script>
+<script>
+async function loadEbooks() {
+  const [listResp, metaResp] = await Promise.all([
+    fetch('../ebooks_list.json').then(r=>r.json()).catch(_=>[]),
+    fetch('../data/ebooks_meta.json').then(r=>r.json()).catch(_=>({}))
+  ]);
+  const meta = metaResp;
+  const items = listResp.map(x => {
+    const key = x.href.split('/').pop();
+    const m = meta[key] || {};
+    return {
+      title: m.title || x.title,
+      href: x.href,
+      size: x.size, // "123 KB"
+      sizeNum: parseInt(x.size) || 0,
+      date: x.date,
+      desc: m.desc || '',
+      category: m.category || 'Uncategorized',
+      tags: m.tags || []
+    };
+  });
+
+  // Populate category filter
+  const cats = Array.from(new Set(items.map(i=>i.category))).sort();
+  const catSel = document.getElementById('categoryFilter');
+  cats.forEach(c => {
+    const opt = document.createElement('option'); opt.value=c; opt.textContent=c; catSel.appendChild(opt);
+  });
+
+  const grid = document.getElementById('ebooks-grid');
+  const searchBox = document.getElementById('searchBox');
+  const sortSel = document.getElementById('sortSelect');
+  const modal = document.getElementById('pdfModal');
+  const pdfFrame = document.getElementById('pdfFrame');
+  const pdfTitle = document.getElementById('pdfTitle');
+  const pdfClose = document.getElementById('pdfClose');
+
+  function render(){
+    const q = searchBox.value.toLowerCase();
+    const cat = catSel.value;
+    let arr = items.filter(i =>
+      (cat==='' || i.category===cat) &&
+      (i.title.toLowerCase().includes(q) || i.desc.toLowerCase().includes(q) || i.tags.join(' ').toLowerCase().includes(q))
+    );
+    const s = sortSel.value;
+    arr.sort((a,b)=>{
+      if(s==='title-asc') return a.title.localeCompare(b.title);
+      if(s==='title-desc') return b.title.localeCompare(a.title);
+      if(s==='date-desc') return (b.date||'').localeCompare(a.date||'');
+      if(s==='date-asc') return (a.date||'').localeCompare(b.date||'');
+      if(s==='size-desc') return b.sizeNum - a.sizeNum;
+      if(s==='size-asc') return a.sizeNum - b.sizeNum;
+      return 0;
+    });
+    grid.innerHTML = arr.map(i => `
+      <div class="card">
+        <div class="title">${i.title}</div>
+        <div class="desc">${i.category} • ${i.size} • ${i.date||''}</div>
+        <div class="desc">${i.desc}</div>
+        <div style="display:flex; gap:8px; margin-top:8px;">
+          <button class="btn btn-primary" data-open="${i.href}" data-title="${i.title}">Preview</button>
+          <a class="btn" href="${i.href}" target="_blank">Download</a>
+        </div>
+      </div>`).join('');
+    // bind preview buttons
+    grid.querySelectorAll('[data-open]').forEach(btn=>{
+      btn.addEventListener('click', e=>{
+        const href = btn.getAttribute('data-open');
+        const t = btn.getAttribute('data-title');
+        pdfTitle.textContent = t;
+        pdfFrame.src = href + '#toolbar=0&navpanes=0';
+        modal.classList.add('open');
+      });
+    });
+  }
+  [searchBox, catSel, sortSel].forEach(el => el.addEventListener('input', render));
+  pdfClose.onclick = () => { modal.classList.remove('open'); pdfFrame.src=''; };
+  modal.addEventListener('click', (e)=>{ if(e.target===modal){ pdfClose.click(); } });
+  render();
+}
+loadEbooks();
+</script>
+
+<script>
+// add 'reveal' class to cards after render, and pop sequentially
+(function(){
+  function animateCards(){
+    const grid = document.getElementById('ebooks-grid');
+    if(!grid) return;
+    const cards = grid.querySelectorAll('.card');
+    cards.forEach((c,i)=>{
+      c.classList.add('reveal');
+      setTimeout(()=>{ c.classList.add('pop'); c.classList.add('visible'); }, 60*i);
+    });
+  }
+  // observe grid changes (works when content is replaced)
+  const grid = document.getElementById('ebooks-grid');
+  if(grid){
+    const obs = new MutationObserver(()=>{ animateCards(); });
+    obs.observe(grid, { childList: true, subtree: true });
+    // initial run
+    setTimeout(animateCards, 120);
+  } else {
+    document.addEventListener('DOMContentLoaded', animateCards);
+  }
+})();
+</script>
+
+<script>
+if('serviceWorker' in navigator){
+  navigator.serviceWorker.register('/service-worker.js').catch(()=>console.log('SW register failed'));
+}
+</script>
+
+<script>
+fetch('/ebooks_list.json')
+  .then(res => res.json())
+  .then(data => {
+    const grid = document.getElementById('ebooks-grid');
+    grid.innerHTML = '';
+    data.forEach(item => {
+      const card = document.createElement('div');
+      card.className = 'card reveal';
+      const thumbUrl = item.thumb && item.thumb.trim() !== '' ? item.thumb : '/assets/img/pdf-placeholder.jpg';
+      card.innerHTML = `
+        <div class="thumb-wrap" style="margin-bottom:8px;">
+          <img src="${thumbUrl}" alt="${item.title}" class="thumb-img" style="width:100%;border-radius:8px;cursor:pointer;"/>
+        </div>
+        <div class="title">${item.title}</div>
+        <div class="desc">${item.desc || ''}</div>
+        <div class="tag">${item.size || ''} ${item.date ? ' | ' + item.date : ''}</div>
+        <div style="margin-top:8px;">
+          <a href="${item.href}" class="btn btn-primary" target="_blank">View</a>
+          <button class="btn btn-ghost preview-btn">Preview</button>
+        </div>
+      `;
+      // Clicking the thumbnail opens preview
+      card.querySelector('.thumb-img').addEventListener('click', () => {
+        const btn = card.querySelector('.preview-btn');
+        if(btn) btn.click();
+      });
+      grid.appendChild(card);
+    });
+  });
+</script>
+</body>
+
+
+
+</html>
