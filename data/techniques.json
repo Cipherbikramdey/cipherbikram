@@ -1,0 +1,20 @@
+[
+  {
+    "title": "Network Recon with Nmap",
+    "desc": "Aggressive scan with version and OS detection.",
+    "command": "nmap -A target.com",
+    "level": "Beginner"
+  },
+  {
+    "title": "Directory Bruteforce",
+    "desc": "Discover hidden paths with wordlists.",
+    "command": "ffuf -u https://site/FUZZ -w /path/to/wordlist.txt",
+    "level": "Intermediate"
+  },
+  {
+    "title": "Password Hash Cracking (Demo)",
+    "desc": "Hashcat quick start example.",
+    "command": "hashcat -m 0 -a 0 hashes.txt rockyou.txt",
+    "level": "Advanced"
+  }
+]

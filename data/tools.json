@@ -1,0 +1,12 @@
+[
+  {
+    "title": "HTTP Header Grabber Script",
+    "desc": "Simple Python script template (sample).",
+    "href": "tools/http_headers.py"
+  },
+  {
+    "title": "Bash Recon Script",
+    "desc": "Quick recon helper (sample).",
+    "href": "tools/recon.sh"
+  }
+]
