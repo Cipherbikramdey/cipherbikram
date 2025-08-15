@@ -8,5 +8,16 @@
     "title": "Advanced Bash Shell Scripting Guide",
     "desc": "Bash World.",
     "href": "/ebooks/Advanced-Bash-Shell-Scripting-Gude.pdf"
+  },
+   {
+    "title": "Course-Handbook",
+    "desc": "Full Stack Web Attack",
+    "href": "/ebooks/Course-Handbook.pdf"
+  }, 
+  {
+    "title": "/The-Web-Application-handbook",
+    "desc": "Finding and Exploiting Web Security Flaws",
+    "href": "/ebooks//The-Web-Application-handbook.pdf"
   }
+
 ]
