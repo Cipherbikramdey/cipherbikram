@@ -1,0 +1,73 @@
+
+<!doctype html>
+<html lang="en">
+  <head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>CipherBikram</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/css/style.css">
+</head>
+  <body>
+    
+<header class="header">
+  <nav class="nav">
+    <div class="logo"><span class="glitch" data-text="CIPHER BIKRAM">CIPHER BIKRAM</span></div>
+    <div class="menu">
+      <a href="index.html">Home</a>
+      <a href="ebooks/index.html">Ebooks</a>
+      <a href="techniques/index.html">Techniques</a>
+      <a href="images/hacker-gallery/index.html">Hacker Gallery</a>
+      <a href="tools/index.html">Tools</a>
+      <a href="blogs/index.html">Blogs</a>
+      <a href="about/index.html">About Me</a>
+      <a href="contact/index.html">Contact</a>
+    </div>
+  </nav>
+</header>
+
+    <section class="section">
+      <h2>About Me</h2>
+      <div class="card">
+        <div class="title">CipherBikram</div>
+        <p class="desc">Breaking limits, exploring vulnerabilities, and sharing knowledge with the world. Focused on ethical hacking, red teaming, and security research.</p>
+        <p class="desc">Skills: Kali Linux, Python, Bash, Nmap, Wireshark, Metasploit, OSINT.</p>
+        <div class="notice">Tip: There's an easter egg in the console. Try typing <code>help</code> or <code>whoami</code> 😉</div>
+      </div>
+    </section>
+    
+<footer class="footer">
+  <div class="inner">
+    <div>© 2025 CipherBikram • Built for hackers, by hackers.</div>
+    <div>
+      <a href="https://github.com/" target="_blank" rel="noopener">GitHub</a> &nbsp;•&nbsp;
+      <a href="#" target="_blank" rel="noopener">Telegram</a> &nbsp;•&nbsp;
+      <a href="#" target="_blank" rel="noopener">Discord</a>
+    </div>
+  </div>
+</footer>
+<script src="assets/js/utils.js"></script>
+<script src="assets/js/render.js"></script>
+<script src="assets/js/main.js"></script>
+
+    <script>
+      window.addEventListener('keydown', (e)=>{
+        window.__secret = (window.__secret||'') + e.key;
+        if(window.__secret.endsWith('help')){
+          alert('Try: whoami, motd, contact');
+        }
+        if(window.__secret.endsWith('whoami')){
+          alert('CipherBikram — security enthusiast, builder of this portal.');
+        }
+        if(window.__secret.endsWith('motd')){
+          alert('Stay curious. Hack ethically. Share knowledge.');
+        }
+        if(window.__secret.endsWith('contact')){
+          location.href = '../contact/index.html';
+        }
+      });
+    </script>
+  </body>
+</html>
