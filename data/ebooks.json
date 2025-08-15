@@ -2,22 +2,21 @@
   {
     "title": "100 Free Security Tools",
     "desc": "Top tools for ethical hackers & DFIR.",
-    "href": "/ebooks/100-free-security-tools.pdf"
+    "href": "ebooks/100-free-security-tools.pdf"
   },
   {
     "title": "Advanced Bash Shell Scripting Guide",
     "desc": "Bash World.",
-    "href": "/ebooks/Advanced-Bash-Shell-Scripting-Gude.pdf"
+    "href": "ebooks/Advanced-Bash-Shell-Scripting-Guide.pdf"
   },
-   {
+  {
     "title": "Course-Handbook",
     "desc": "Full Stack Web Attack",
-    "href": "/ebooks/Course-Handbook.pdf"
-  }, 
+    "href": "ebooks/Course-Handbook.pdf"
+  },
   {
-    "title": "/The-Web-Application-handbook",
+    "title": "The Web Application Handbook",
     "desc": "Finding and Exploiting Web Security Flaws",
-    "href": "/ebooks//The-Web-Application-handbook.pdf"
+    "href": "ebooks/The-Web-Application-handbook.pdf"
   }
-
 ]
