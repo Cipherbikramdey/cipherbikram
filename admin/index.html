@@ -1,0 +1,112 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Admin — Cipherbikram</title>
+<link rel="stylesheet" href="/assets/css/style.css">
+<style>
+.admin-shell{display:flex;gap:16px}
+.admin-sidebar{width:220px;padding:14px;background:var(--panel);border-radius:10px}
+.admin-main{flex:1;padding:14px}
+.admin-card{background:linear-gradient(180deg, rgba(255,255,255,0.02), transparent);padding:12px;border-radius:10px;margin-bottom:12px;border:1px solid rgba(255,255,255,0.03)}
+.file-list{max-height:200px;overflow:auto;padding:8px;border-radius:8px;background:rgba(0,0,0,0.02)}
+.btn-ghost{background:transparent;border:1px solid rgba(255,255,255,0.06);padding:8px 10px;border-radius:8px;cursor:pointer}
+</style>
+</head>
+<body>
+<header class="header"><div class="container nav"><div class="brand"><div class="logo">CB</div><div>Cipherbikram</div></div><div><button id="logoutBtn" class="btn-ghost">Logout</button></div></div></header>
+<main class="container"><div id="adminRoot" class="admin-shell"></div></main>
+<script>
+(function(){
+  const PASS = "Cipher@2025";
+  if(!localStorage.getItem('admin_authenticated')){
+    const p = prompt("Admin password:");
+    if(p !== PASS){ document.body.innerHTML = "<div style='padding:60px;text-align:center'><h2>Access denied</h2></div>"; return; }
+    localStorage.setItem('admin_authenticated','1');
+  }
+})();
+
+const root = document.getElementById('adminRoot');
+root.innerHTML = `
+<aside class="admin-sidebar"><h3>Admin</h3>
+<nav style="display:flex;flex-direction:column;gap:8px;margin-top:10px">
+<a href="#overview" class="badge">Overview</a>
+<a href="#resources" class="badge">Resources</a>
+<a href="#users" class="badge">Users</a>
+<a href="#messages" class="badge">Messages</a>
+<a href="#settings" class="badge">Settings</a>
+</nav></aside>
+<section class="admin-main">
+<div id="overview" class="admin-card"><h2>Overview</h2><div style="display:flex;gap:12px;margin-top:10px"><div class="admin-card" style="flex:1"><strong id="statFiles">0</strong><div class="small-muted">Resources</div></div><div class="admin-card" style="flex:1"><strong id="statMsgs">0</strong><div class="small-muted">Messages</div></div></div></div>
+
+<div id="resources" class="admin-card"><h3>Resources</h3><p class="small-muted">Select files and create a ZIP to download and upload to the repo.</p>
+<input id="fileInput" type="file" multiple>
+<div style="margin-top:8px"><button id="makeZip" class="button">Create ZIP</button> <button id="clearFiles" class="btn-ghost">Clear</button></div>
+<div id="fileList" class="file-list" style="margin-top:8px">No files staged.</div>
+</div>
+
+<div id="users" class="admin-card"><h3>Users</h3><table style="width:100%"><thead class="small-muted"><tr><th>Name</th><th>Role</th></tr></thead><tbody><tr><td>Bikram</td><td>Admin</td></tr><tr><td>Alice</td><td>Editor</td></tr></tbody></table></div>
+
+<div id="messages" class="admin-card"><h3>Messages</h3><p class="small-muted">Local demo messages. Import CSV to view.</p><input id="importCSV" type="file" accept=".csv"><div id="msgList" style="margin-top:10px" class="small-muted">No messages</div></div>
+
+<div id="settings" class="admin-card"><h3>Settings</h3><label class="small-muted">Social links</label><div style="display:flex;gap:8px;margin-top:8px"><input id="linkGithub" placeholder="GitHub URL"><input id="linkLinkedin" placeholder="LinkedIn URL"><button id="saveSettings" class="button">Save</button></div><div style="margin-top:10px"><button id="toggleTheme" class="btn-ghost">Toggle theme</button></div></div>
+
+</section>
+`;
+
+// file handling & local storage
+function updateStats(){ const files = JSON.parse(localStorage.getItem('admin_files')||'[]'); document.getElementById('statFiles').innerText = files.length; document.getElementById('fileList').innerHTML = files.length? files.map(f=>`<div style="display:flex;justify-content:space-between;padding:6px 8px;border-bottom:1px solid rgba(255,255,255,0.02)">${f.name}<span class="small-muted">${(f.size/1024).toFixed(1)} KB</span></div>`).join('') : 'No files staged.'; const msgs = JSON.parse(localStorage.getItem('admin_msgs')||'[]'); document.getElementById('statMsgs').innerText = msgs.length; document.getElementById('msgList').innerHTML = msgs.length? msgs.map(m=>`<div><strong>${m.name}</strong> (${m.email})<div class="small-muted">${m.message}</div></div>`).join('') : 'No messages'; }
+
+document.getElementById('fileInput').addEventListener('change', async (e)=>{ const fs = Array.from(e.target.files); const stored = JSON.parse(localStorage.getItem('admin_files')||'[]'); for(const f of fs){ const ab = await f.arrayBuffer(); const b64 = btoa(String.fromCharCode(...new Uint8Array(ab))); stored.push({name:f.name,size:f.size,content:b64}); } localStorage.setItem('admin_files', JSON.stringify(stored)); updateStats(); });
+
+document.getElementById('clearFiles').addEventListener('click', ()=>{ localStorage.removeItem('admin_files'); updateStats(); });
+
+async function loadJSZip(){ if(window.JSZip) return window.JSZip; return new Promise((res,rej)=>{ const s=document.createElement('script'); s.src='https://cdn.jsdelivr.net/npm/jszip@3.10.0/dist/jszip.min.js'; s.onload=()=>res(window.JSZip); s.onerror=()=>rej(); document.head.appendChild(s); }); }
+
+document.getElementById('makeZip').addEventListener('click', async ()=>{ const files = JSON.parse(localStorage.getItem('admin_files')||'[]'); if(!files.length){ alert('No files staged'); return; } const JSZip = await loadJSZip(); const zip = new JSZip(); for(const f of files){ const bin = Uint8Array.from(atob(f.content), c=>c.charCodeAt(0)); zip.file(f.name, bin); } const blob = await zip.generateAsync({type:'blob'}); const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = 'resources_'+Date.now()+'.zip'; a.click(); });
+
+document.getElementById('importCSV').addEventListener('change', function(e){ const f = e.target.files[0]; if(!f) return; const r = new FileReader(); r.onload = ()=>{ const rows = r.result.split('\n').map(s=>s.trim()).filter(Boolean); const msgs = JSON.parse(localStorage.getItem('admin_msgs')||'[]'); for(const row of rows){ const cols = row.split(','); msgs.push({name:cols[0]||'Anon', email:cols[1]||'', message:cols.slice(2).join(',')}); } localStorage.setItem('admin_msgs', JSON.stringify(msgs)); updateStats(); }; r.readAsText(f); });
+
+document.getElementById('saveSettings').addEventListener('click', ()=>{ localStorage.setItem('admin_settings', JSON.stringify({github:document.getElementById('linkGithub').value, linkedin:document.getElementById('linkLinkedin').value})); alert('Saved locally'); });
+
+document.getElementById('toggleTheme').addEventListener('click', ()=>{ const cur = document.documentElement.getAttribute('data-theme')==='light' ? 'light' : 'dark'; const next = cur==='light' ? 'dark' : 'light'; document.documentElement.setAttribute('data-theme', next); localStorage.setItem('site-theme', next); });
+
+document.getElementById('logoutBtn').addEventListener('click', ()=>{ localStorage.removeItem('admin_authenticated'); location.href='/'; });
+
+// init
+(function(){ const s = JSON.parse(localStorage.getItem('admin_settings')||'{}'); if(s.github) document.getElementById('linkGithub').value=s.github; if(s.linkedin) document.getElementById('linkLinkedin').value=s.linkedin; updateStats(); })();
+</script>
+<script src="/assets/js/firebase.js"></script>
+<script>
+// If Firebase is configured, prefer Firebase Auth for admin access
+(async function(){
+  if(window.firebaseConfig && !window.firebaseConfig.apiKey.startsWith('REPLACE')){
+    try{
+      await initFirebaseIfConfigured();
+      // listen auth state and require a signed-in admin user
+      window.__fbAuth.onAuthStateChanged(user => {
+        if(!user){
+          // show simple sign-in overlay
+          const email = prompt('Firebase Admin login — email:');
+          const pass = prompt('Password:');
+          if(email && pass){
+            window.__fbAuth.signInWithEmailAndPassword(email, pass).catch(err=>{ alert('Login failed: '+err.message); location.href='/' });
+          } else {
+            document.body.innerHTML = '<div style="padding:60px;text-align:center"><h2>Access required</h2></div>';
+          }
+        } else {
+          // signed in, continue
+          console.log('Admin signed in', user.email);
+        }
+      });
+    }catch(err){
+      console.warn('Firebase init failed', err);
+    }
+  }
+})();
+</script>
+
+</body>
+</html>
+
+<button id="uploadToFirebase">Upload to Firebase</button>
