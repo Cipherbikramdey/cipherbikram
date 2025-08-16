@@ -1,1 +1,0 @@
-Admin notes:\n- Default password: Cipher@2025 (change in /admin/index.html)\n- Client-side protection only. For real security use server-side auth.\n- Use Resources panel to prepare ZIPs for upload.
